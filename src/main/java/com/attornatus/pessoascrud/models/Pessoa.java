@@ -1,17 +1,23 @@
 package com.attornatus.pessoascrud.models;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Pessoa {
 	
 	@GeneratedValue
 	@Id
+	@Column(name = "pessoa_id")
 	private int id;
 	
 	@Column(name = "nome")
@@ -20,30 +26,19 @@ public class Pessoa {
 	@Column(name = "dataNascimento")
 	private Date dataNascimento;
 	
-	@Column(name = "logradouro")
-	private String logradouro;
-	
-	@Column(name = "cep")
-	private String cep;
-	
-	@Column(name = "numero")
-	private String numero;
-	
-	@Column(name = "cidade")
-	private String cidade;
+	@OneToMany(mappedBy="pessoa")
+	@JsonIgnore
+	private List<Endereco> enderecos;
 	
 	public Pessoa() {
-		
+		this.enderecos = new ArrayList<>();
 	}
 	
-	public Pessoa(String nome, Date dataNascimento, String logradouro, String cep, String numero, String cidade) {
+	public Pessoa(String nome, Date dataNascimento) {
 		super();
 		this.nome = nome;
 		this.dataNascimento = dataNascimento;
-		this.logradouro = logradouro;
-		this.cep = cep;
-		this.numero = numero;
-		this.cidade = cidade;
+		this.enderecos = new ArrayList<>();
 	}
 	
 	public int getId() {
@@ -65,37 +60,44 @@ public class Pessoa {
 	public void setDataNascimento(Date dataNascimento) {
 		this.dataNascimento = dataNascimento;
 	}
-
-	public String getLogradouro() {
-		return logradouro;
+	
+	public Endereco getEnderecoPrincipal() {
+		for(Endereco end : this.enderecos) {
+			if (end.isPrincipal()) {
+				return end;
+			}
+		}
+		return null;
 	}
-
-	public void setLogradouro(String logradouro) {
-		this.logradouro = logradouro;
+	
+	public void setEnderecoPrincipal(Endereco endereco) {
+		for (Endereco end : this.enderecos) {
+			end.setIsPrincipal(false);
+		}
+		endereco.setIsPrincipal(true);
 	}
-
-	public String getCep() {
-		return cep;
+	
+	public List<Endereco> getEnderecos(){
+		return this.enderecos;
 	}
-
-	public void setCep(String cep) {
-		this.cep = cep;
+	
+	public void setEnderecos(List<Endereco> enderecos) {
+		this.enderecos = enderecos;
 	}
-
-	public String getNumero() {
-		return numero;
+	
+	public void addEndereco(Endereco endereco) {
+		if (endereco.getPessoa() != this) {
+			endereco.setPessoa(this);			
+		}
+		this.enderecos.add(endereco);
+		if (endereco.isPrincipal() == true) {
+			this.setEnderecoPrincipal(endereco);
+		}
 	}
-
-	public void setNumero(String numero) {
-		this.numero = numero;
-	}
-
-	public String getCidade() {
-		return cidade;
-	}
-
-	public void setCidade(String cidade) {
-		this.cidade = cidade;
+	
+	public void removeEndereco(Endereco endereco) {
+		endereco.setPessoa(null);
+		this.enderecos.remove(endereco);
 	}
 	
 	public String toString() {
