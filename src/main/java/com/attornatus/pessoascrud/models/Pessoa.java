@@ -35,7 +35,6 @@ public class Pessoa {
 	}
 	
 	public Pessoa(String nome, Date dataNascimento) {
-		super();
 		this.nome = nome;
 		this.dataNascimento = dataNascimento;
 		this.enderecos = new ArrayList<>();
@@ -71,7 +70,7 @@ public class Pessoa {
 	}
 	
 	public void setEnderecoPrincipal(Endereco endereco) {
-		for (Endereco end : this.enderecos) {
+		for (Endereco end : this.getEnderecos()) {
 			end.setIsPrincipal(false);
 		}
 		endereco.setIsPrincipal(true);
@@ -89,10 +88,10 @@ public class Pessoa {
 		if (endereco.getPessoa() != this) {
 			endereco.setPessoa(this);			
 		}
-		this.enderecos.add(endereco);
 		if (endereco.isPrincipal() == true) {
 			this.setEnderecoPrincipal(endereco);
 		}
+		this.enderecos.add(endereco);
 	}
 	
 	public void removeEndereco(Endereco endereco) {

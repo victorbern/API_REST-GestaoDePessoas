@@ -9,6 +9,7 @@ import com.attornatus.pessoascrud.models.Pessoa;
 
 public class PessoaDTO {
 	
+	private int id;
 	private String nome;
 	private Date dataNascimento;
 	private List<EnderecoDTO> enderecos;
@@ -17,16 +18,26 @@ public class PessoaDTO {
 		
 	}
 	
-	public PessoaDTO(String nome, Date dataNascimento, List<Endereco> enderecos) {
+	public PessoaDTO(int id, String nome, Date dataNascimento, List<Endereco> enderecos) {
+		this.id = id;
 		this.nome = nome;
 		this.dataNascimento = dataNascimento;
 		this.enderecos = this.convertEnderecos(enderecos);
 	}
 	
 	public PessoaDTO(Pessoa pessoa) {
+		id = pessoa.getId();
 		nome = pessoa.getNome();
 		dataNascimento = pessoa.getDataNascimento();
 		enderecos = this.convertEnderecos(pessoa.getEnderecos());
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getNome() {

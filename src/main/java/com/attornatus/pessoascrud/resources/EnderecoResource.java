@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,16 +20,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.attornatus.pessoascrud.dto.EnderecoDTO;
 import com.attornatus.pessoascrud.models.Endereco;
+import com.attornatus.pessoascrud.models.Pessoa;
 import com.attornatus.pessoascrud.repositories.EnderecoRepositorio;
+import com.attornatus.pessoascrud.repositories.PessoaRepositorio;
 
 @RestController
 @RequestMapping(value = "/enderecos")
 public class EnderecoResource {
 	
+	@Autowired
 	private EnderecoRepositorio enderecoRepositorio;
 	
+	@Autowired
+	private PessoaRepositorio pessoaRepositorio;
+	
 	public EnderecoResource(EnderecoRepositorio enderecoRepositorio) {
-		super();
 		this.enderecoRepositorio = enderecoRepositorio;
 	}
 	
@@ -36,6 +42,7 @@ public class EnderecoResource {
 	@Transactional
 	public ResponseEntity<EnderecoDTO> save(@RequestBody Endereco endereco){
 		enderecoRepositorio.save(endereco);
+		this.setEnderecoPrincipal(endereco);
 		EnderecoDTO enderecoDTO = new EnderecoDTO(endereco);
 		return new ResponseEntity<>(enderecoDTO, HttpStatus.OK);
 	}
@@ -90,6 +97,18 @@ public class EnderecoResource {
 			EnderecoDTO enderecoDTO = new EnderecoDTO(enderecoAtualizado);
 			return ResponseEntity.ok().body(enderecoDTO);
 		}).orElse(ResponseEntity.notFound().build());
+	}
+	
+	public void setEnderecoPrincipal(Endereco endereco) {
+		if (endereco.isPrincipal() == true) {
+			this.updateEnderecos(endereco);
+		}
+	}
+	
+	public void updateEnderecos(Endereco endereco) {
+		Pessoa pessoa = pessoaRepositorio.findById(endereco.getPessoa().getId()).get();
+		pessoa.setEnderecoPrincipal(endereco);
+		pessoaRepositorio.save(pessoa);
 	}
 	
 }

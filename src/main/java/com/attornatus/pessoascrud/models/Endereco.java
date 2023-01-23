@@ -27,7 +27,7 @@ public class Endereco {
 	private String cidade;
 	
 	@Column(name = "isPrincipal")
-	private boolean isPrincipal = false;
+	private boolean isPrincipal;
 	
 	@ManyToOne
 	@JoinColumn(name = "pessoa_id")
